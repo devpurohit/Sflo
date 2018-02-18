@@ -32,7 +32,6 @@ result = result.T.reset_index(drop=True).T
 result[0] = result[0].map(lambda x: (ipaddress.IPv4Address(x)))
 # Another DF with only unique pings
 unik = result.drop_duplicates(subset=0)
-
 # Melting data to find counter
 melt = pd.value_counts(result[0].values, sort=True)
 
@@ -43,7 +42,16 @@ def printn(n):
     print(melt[:n])
 
 
-printn(5)
+# Function to print the total number of IP encountered.
+def count_unik():
+    print(len(unik.index), "IPs")
+
+
+# Function to print the top n Ports
+def unik_ports(n):
+    unik_melt = pd.value_counts(result[3].values, sort=True)
+    print(unik_melt[:n])
+
 
 
 '''
