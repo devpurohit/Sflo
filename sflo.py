@@ -13,8 +13,8 @@ path = r'C:\Users\Rahul\Desktop\Logs'
 all_logs = glob.glob(os.path.join(path, "*.csv"))
 
 # Show all the found log files
-for i in all_logs:
-    print(i, "\n", end="")
+# for i in all_logs:
+#    print(i, "\n", end="")
 
 dfa = []
 # Concatenating all log files into one
@@ -37,9 +37,10 @@ melt = pd.value_counts(result[0].values, sort=True)
 
 
 # Function to print 'n' first IPs
-def printn(n):
-    print("The top", n, "IPs are: \n")
-    print(melt[:n])
+def printn():
+    n = int(input("Enter the 'N'\n"))
+    print("The top", n, "IPs are: ")
+    print(melt[0:n])
 
 
 # Function to print the total number of IP encountered.
@@ -48,13 +49,23 @@ def count_unik():
 
 
 # Function to print the top n Ports
-def unik_ports(n):
+def unik_ports():
+    n = int(input("Enter the 'N':\n"))
     unik_melt = pd.value_counts(result[3].values, sort=True)
-    print(unik_melt[:n])
+    print(unik_melt[0:n])
 
 
+# Menu
 
-'''
-for k in result:
-    print(k, "\t\t", end="")
-'''
+print("###Menu###")
+print("Enter desired command:")
+print("1. No. of unique IPs encountered.")
+print("2. Top 'N' no. of IPs.")
+print("3. Top 'N' no. of Ports being used.")
+mn = int(input())
+if mn == 1:
+    count_unik()
+elif mn == 2:
+    printn()
+elif mn == 3:
+    unik_ports()
