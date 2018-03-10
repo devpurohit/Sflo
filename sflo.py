@@ -36,11 +36,12 @@ class log:
 
     def datacls(self):
         self.clrdata = self.result.loc[(self.result.SourceIP == self.result.SourceIP.shift(-1)) &
-                  (self.result.SourcePort == self.result.SourcePort.shift(-1)) ] 
+                  (self.result.SourcePort == self.result.SourcePort.shift(-1)) &
+                  (self.result.Status != self.result.Status.shift(-1))
+                  ] 
         self.result = self.result[~self.result.index.isin(self.clrdata.index)]
         self.result.reset_index(inplace=True, drop=True)  
-        print(self.result.head(10))
-        
+
         #Saving to an external file
         self.result.to_csv('res.csv') 
 
@@ -48,14 +49,14 @@ class log:
     # Function to print the total number of IP encountered.
     def count_unik(self):
         # Another DF with only unique pings
-        self.unik = self.result.drop_duplicates(subset=0)
+        self.unik = self.result.drop_duplicates('SourceIP')
         print(len(self.unik.index), "IPs")
 
     
     # Function to print 'n' first IPs
     def unik_ip(self):
         # Melting data to find count of IPs
-        self.ip_melt = pd.value_counts(self.result[0].values, sort=True)
+        self.ip_melt = pd.value_counts(self.result['SourceIP'].values, sort=True)
         n = int(input("Enter the 'N'\n"))
         print("The top", n, "IPs are: ")
         print(self.ip_melt[0:n])
@@ -63,24 +64,40 @@ class log:
 
     # Function to plot top IPs
     def ip_plt(self):
+        self.ip_melt = pd.value_counts(self.result['SourceIP'].values, sort=True)
         n = int(input("Enter the 'N':\n"))
         pplt = self.ip_melt[:n]
+        plt.xticks(fontsize=7, rotation=45)
         pplt.plot(kind='bar')
         plt.show()
     
    # Function to print the top n Ports
     def unik_ports(self):
         # Melted data to find count of ports Ports
-        self.port_melt = pd.value_counts(self.result[3].values, sort=True)
+        self.port_melt = pd.value_counts(self.result['DPort'].values, sort=True)
         n = int(input("Enter the 'N':\n"))
         print(self.port_melt[0:n])
 
     # Function to print a plot of ports
     def port_plt(self):
+        self.port_melt = pd.value_counts(self.result['DPort'].values, sort=True)
         n = int(input("Enter the 'N':\n"))
         pplt = self.port_melt[:n]
+        plt.xticks(fontsize=7, rotation=45)
         pplt.plot(kind='bar')
         plt.show()
+
+    # Function to print top 'N' IPs with their unique port count
+    def unik_poip(self):
+       n = int(input("Enter the 'N':\n")) 
+       self.ip_melt = pd.value_counts(self.result['SourceIP'].values, sort=True)
+       for ip in self.ip_melt[0:n].index:
+           print(f"Unique ports for the IP : {ip}")
+           temp = self.result.loc[self.result['SourceIP'] == ip, 'DPort']
+           temp = temp.drop_duplicates()
+           temp.reset_index(inplace=True, drop=True)
+           print(temp.head(10))
+
 
 
 # Menu
@@ -91,9 +108,9 @@ print("2. Top 'N' no. of IPs.")
 print("3. Plot Top 'N' IPs")
 print("4. Top 'N' no. of Ports being used.")
 print("5. Plot Top 'N' ports.")
+print("6. Unique Ports of Top IPs.")
 
 logx = log()
-
 
 mn = int(input())
 if mn == 1:
@@ -107,4 +124,4 @@ elif mn == 4:
 elif mn == 5:
     logx.port_plt()
 elif mn == 6:
-    logx.datacls()    
+    logx.unik_poip()  
