@@ -21,6 +21,7 @@ class log:
             self.df = pd.read_csv(f, header=None)
             self.dfa.append(self.df)
         self.result = pd.concat(self.dfa)
+        self.result.columns = log.names
         self.result.to_csv('res.csv')    
 
     def dataready(self):
