@@ -3,7 +3,7 @@ import glob
 import pandas as pd
 import ipaddress
 import matplotlib.pyplot as plt
-
+import geoip
 
 class log:
     names = ["Timestamp", "SourceIP", "SourcePort", "DPort",
@@ -98,7 +98,15 @@ class log:
            temp.reset_index(inplace=True, drop=True)
            print(temp.head(10))
 
-
+    def ip_geo(self):
+        # Melting data to find count of IPs
+        self.ip_melt = pd.value_counts(self.result['SourceIP'].values, sort=True)
+        n = int(input("Enter the 'N'\n"))
+        gi = geoip.open_database(b"en.csv")
+        print("The top", n, "IPs are: ")
+        for ip in self.ip_melt[0:n].index:
+            ip = str(ip)
+            print(gi.record_by_name(ip))
 
 # Menu
 print("###Menu###")
@@ -109,6 +117,7 @@ print("3. Plot Top 'N' IPs")
 print("4. Top 'N' no. of Ports being used.")
 print("5. Plot Top 'N' ports.")
 print("6. Unique Ports of Top IPs.")
+print("7. Print Top IPs with GeoLocation.")
 
 logx = log()
 
@@ -124,4 +133,6 @@ elif mn == 4:
 elif mn == 5:
     logx.port_plt()
 elif mn == 6:
-    logx.unik_poip()  
+    logx.unik_poip() 
+elif mn == 7:
+    logx.ip_geo() 
